@@ -183,20 +183,45 @@ export default function Gallery({ onNavigate }: GalleryProps) {
   const [activePainting, setActivePainting] = useState<Painting | null>(null);
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set());
 
+  const normalizeKey = useCallback((e: KeyboardEvent) => {
+    switch (e.code) {
+      case "KeyW":
+        return "w";
+      case "KeyA":
+        return "a";
+      case "KeyS":
+        return "s";
+      case "KeyD":
+        return "d";
+      case "ArrowUp":
+        return "arrowup";
+      case "ArrowDown":
+        return "arrowdown";
+      case "ArrowLeft":
+        return "arrowleft";
+      case "ArrowRight":
+        return "arrowright";
+      default:
+        return e.key.toLowerCase();
+    }
+  }, []);
+
   const onKeyDown = useCallback((e: KeyboardEvent) => {
-    const k = e.key.toLowerCase();
+    const k = normalizeKey(e);
+    if (!k) return;
     keysRef.current.add(k);
     setActiveKeys(new Set(keysRef.current));
     if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(k)) {
       e.preventDefault();
     }
-  }, []);
+  }, [normalizeKey]);
 
   const onKeyUp = useCallback((e: KeyboardEvent) => {
-    const k = e.key.toLowerCase();
+    const k = normalizeKey(e);
+    if (!k) return;
     keysRef.current.delete(k);
     setActiveKeys(new Set(keysRef.current));
-  }, []);
+  }, [normalizeKey]);
 
   useEffect(() => {
     if (!mountRef.current) return;
